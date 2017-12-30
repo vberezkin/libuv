@@ -281,9 +281,9 @@ $ make -C out
 Note for UNIX users: compile your project with `-D_LARGEFILE_SOURCE` and
 `-D_FILE_OFFSET_BITS=64`. GYP builds take care of that automatically.
 
-### Android using CMake
+### Android and Macos using CMake
 
-Just add add_subdirectory(src/main/cpp/libuv) to your root CMakeLists.txt
+Add add_subdirectory(libuv) to your root CMakeLists.txt
 
 ### Using Ninja
 
