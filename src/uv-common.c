@@ -620,7 +620,7 @@ uv_loop_t* uv_loop_new(void) {
 }
 
 
-int uv_loop_close(uv_loop_t* loop) {
+int uv_loop_close(uv_loop_t* loop, int force) {
   QUEUE* q;
   uv_handle_t* h;
 #ifndef NDEBUG
@@ -630,10 +630,12 @@ int uv_loop_close(uv_loop_t* loop) {
   if (!QUEUE_EMPTY(&(loop)->active_reqs))
     return UV_EBUSY;
 
-  QUEUE_FOREACH(q, &loop->handle_queue) {
-    h = QUEUE_DATA(q, uv_handle_t, handle_queue);
-    if (!(h->flags & UV__HANDLE_INTERNAL))
-      return UV_EBUSY;
+  if (!force) {
+    QUEUE_FOREACH(q, &loop->handle_queue) {
+      h = QUEUE_DATA(q, uv_handle_t, handle_queue);
+      if (!(h->flags & UV__HANDLE_INTERNAL))
+        return UV_EBUSY;
+    }
   }
 
   uv__loop_close(loop);
@@ -656,7 +658,7 @@ void uv_loop_delete(uv_loop_t* loop) {
 
   default_loop = default_loop_ptr;
 
-  err = uv_loop_close(loop);
+  err = uv_loop_close(loop, 0);
   (void) err;    /* Squelch compiler warnings. */
   assert(err == 0);
   if (loop != default_loop)
